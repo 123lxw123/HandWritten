@@ -12,12 +12,14 @@ import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.lxw.handwritten.widget.handwrittenview.IPenConfig;
 import com.lxw.handwritten.widget.handwrittenview.NewDrawPenView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,13 +28,14 @@ public class MainActivity extends AppCompatActivity {
     private NewDrawPenView drawPenView;
     private List<Bitmap> bitmaps;
     private BaseQuickAdapter<Bitmap, BaseViewHolder> adapter;
+    private static final int MSG_ADD_CHARACTER = 1000;
     private Handler handler = new Handler(){
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case 1:
+                case MSG_ADD_CHARACTER:
 
                     break;
             }
@@ -60,14 +63,33 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         drawPenView.setOnTouchListener(new View.OnTouchListener() {
 
+            float left = 0f, right = 0f, top = 0f, bottom = 0f;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case ACTION_DOWN:
-
+                        left = event.getX();
+                        right = event.getX();
+                        top = event.getY();
+                        bottom = event.getY();
+                        handler.removeCallbacksAndMessages(null);
                         break;
-                        case ACTION_UP:
-
+                    case ACTION_MOVE:
+                        if (left > event.getX()) left = event.getX();
+                        if (right < event.getX()) right = event.getX();
+                        if (top > event.getY()) top = event.getY();
+                        if (bottom < event.getY()) bottom = event.getY();
+                        break;
+                    case ACTION_UP:
+                        if (left > event.getX()) left = event.getX();
+                        if (right < event.getX()) right = event.getX();
+                        if (top > event.getY()) top = event.getY();
+                        if (bottom < event.getY()) bottom = event.getY();
+                        Message message = Message.obtain();
+                        message.what = MSG_ADD_CHARACTER;
+                        handler.sendMessageDelayed(message, 1000);
+                        drawPenView.setCanvasCode(IPenConfig.STROKE_TYPE_ERASER);
                         break;
                 }
                 return false;

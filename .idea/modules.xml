@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HandWritten.iml" filepath="$PROJECT_DIR$/HandWritten.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://D:\Data\Android_Project\HandWritten\app\app.iml" filepath="D:\Data\Android_Project\HandWritten\app\app.iml" />
     </modules>
   </component>
 </project>
