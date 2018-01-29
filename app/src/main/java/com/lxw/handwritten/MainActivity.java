@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -14,6 +15,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.lxw.handwritten.widget.handwrittenview.IPenConfig;
 import com.lxw.handwritten.widget.handwrittenview.NewDrawPenView;
+import com.lxw.handwritten.widget.handwrittenview.UtilBitmap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private List<Bitmap> bitmaps;
     private BaseQuickAdapter<Bitmap, BaseViewHolder> adapter;
     private static final int MSG_ADD_CHARACTER = 1000;
+    private float left = 0f, right = 0f, top = 0f, bottom = 0f;
+    private boolean isDrawPenViewReset = true;
     private Handler handler = new Handler(){
 
         @Override
@@ -36,7 +40,11 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_ADD_CHARACTER:
-
+                    Log.d("MSG_ADD_CHARACTER", "" + (int)left + (int)right + (int)top + (int)bottom);
+                    Bitmap bitmap = UtilBitmap.getViewBitmap(drawPenView, left, right, top, bottom);
+                    adapter.addData(bitmap);
+                    drawPenView.setCanvasCode(IPenConfig.STROKE_TYPE_ERASER);
+                    isDrawPenViewReset = true;
                     break;
             }
         }
@@ -63,17 +71,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         drawPenView.setOnTouchListener(new View.OnTouchListener() {
 
-            float left = 0f, right = 0f, top = 0f, bottom = 0f;
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case ACTION_DOWN:
-                        left = event.getX();
-                        right = event.getX();
-                        top = event.getY();
-                        bottom = event.getY();
                         handler.removeCallbacksAndMessages(null);
+                        if (isDrawPenViewReset){
+                            left = event.getX();
+                            right = event.getX();
+                            top = event.getY();
+                            bottom = event.getY();
+                            isDrawPenViewReset = false;
+                        } else {
+                            if (left > event.getX()) left = event.getX();
+                            if (right < event.getX()) right = event.getX();
+                            if (top > event.getY()) top = event.getY();
+                            if (bottom < event.getY()) bottom = event.getY();
+                        }
                         break;
                     case ACTION_MOVE:
                         if (left > event.getX()) left = event.getX();
@@ -89,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
                         Message message = Message.obtain();
                         message.what = MSG_ADD_CHARACTER;
                         handler.sendMessageDelayed(message, 1000);
-                        drawPenView.setCanvasCode(IPenConfig.STROKE_TYPE_ERASER);
                         break;
                 }
                 return false;
