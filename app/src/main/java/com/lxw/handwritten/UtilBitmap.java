@@ -1,6 +1,7 @@
-package com.lxw.handwritten.widget.handwrittenview;
+package com.lxw.handwritten;
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.view.View;
 
 /**
@@ -36,6 +37,26 @@ public class UtilBitmap {
             view.destroyDrawingCache();
         }
         return null;
+    }
+
+    public static Bitmap compress(Bitmap bitmap, int targetWidth, int targetHeight) {
+        try {
+            int bitmapWidth = bitmap.getWidth();
+            int bitmapHeight = bitmap.getHeight();
+            // 缩放图片的尺寸
+            float scaleWidth = (float) targetWidth / bitmapWidth;
+            float scaleHeight = (float) targetHeight / bitmapHeight;
+            float scale = Math.max(scaleWidth, scaleHeight);
+            if (scale > 1f){
+                Matrix matrix = new Matrix();
+                matrix.postScale(scale, scale);
+                // 产生缩放后的Bitmap对象
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, false);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return bitmap;
     }
 
 }
