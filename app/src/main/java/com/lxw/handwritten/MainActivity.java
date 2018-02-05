@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.lxw.handwritten.utils.UtilBitmap;
+import com.lxw.handwritten.utils.UtilScreen;
 import com.lxw.handwritten.widget.handwrittenview.IPenConfig;
 import com.lxw.handwritten.widget.handwrittenview.NewDrawPenView;
 
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean isDrawPenViewReset = true;
     private int targetWidth;
     private int targetHeight;
+    private int screenWidth;
+    private int screenHeight;
     private Handler handler = new Handler(){
 
         @Override
@@ -62,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpView() {
         int spanCount = Constants.RECYCLERVIEW_SPAN_COUNT;
-        targetWidth = (UtilScreen.getScreenWidth(this) - (spanCount + 1) *
+        screenWidth = UtilScreen.getScreenWidth(this);
+        screenHeight = UtilScreen.getScreenHeight(this);
+        targetWidth = (screenWidth - (spanCount + 1) *
                 getResources().getDimensionPixelSize(R.dimen.dp_6)) / spanCount;
         targetHeight = (int) (targetWidth / Constants.CHARACTER_WIDTH_HEIGHT_SCALE);
         recyclerView = findViewById(R.id.recyclerView);
@@ -91,23 +97,14 @@ public class MainActivity extends AppCompatActivity {
                             bottom = event.getY();
                             isDrawPenViewReset = false;
                         } else {
-                            if (left > event.getX()) left = event.getX();
-                            if (right < event.getX()) right = event.getX();
-                            if (top > event.getY()) top = event.getY();
-                            if (bottom < event.getY()) bottom = event.getY();
+                            measureBitmapRectangle(event);
                         }
                         break;
                     case ACTION_MOVE:
-                        if (left > event.getX()) left = event.getX();
-                        if (right < event.getX()) right = event.getX();
-                        if (top > event.getY()) top = event.getY();
-                        if (bottom < event.getY()) bottom = event.getY();
+                        measureBitmapRectangle(event);
                         break;
                     case ACTION_UP:
-                        if (left > event.getX()) left = event.getX();
-                        if (right < event.getX()) right = event.getX();
-                        if (top > event.getY()) top = event.getY();
-                        if (bottom < event.getY()) bottom = event.getY();
+                        measureBitmapRectangle(event);
                         Message message = Message.obtain();
                         message.what = MSG_ADD_CHARACTER;
                         handler.sendMessageDelayed(message, Constants.ADD_CHARACTER_DELAY_MILLIS);
@@ -116,5 +113,19 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    public void measureBitmapRectangle(MotionEvent event){
+        // TODO 最小矩形要添加笔锋宽度的一半
+        int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_10);
+        if (left > event.getX()) left = event.getX() - penPadding;
+        if (left < 0) left = 0;
+        if (right < event.getX()) right = event.getX() + penPadding;
+        if (right > screenWidth) right = screenWidth;
+        if (top > event.getY()) top = event.getY() - penPadding;
+        if (top < 0) top = 0;
+        else if (top > screenHeight * Constants.PADDING_HEIGHT_SCALE) top = screenHeight * Constants.PADDING_HEIGHT_SCALE;
+        if (bottom < event.getY()) bottom = event.getY() + penPadding;
+        if (bottom > screenHeight) bottom = screenHeight;
     }
 }

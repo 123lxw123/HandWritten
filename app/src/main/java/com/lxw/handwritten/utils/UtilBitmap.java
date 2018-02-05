@@ -1,4 +1,4 @@
-package com.lxw.handwritten;
+package com.lxw.handwritten.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;

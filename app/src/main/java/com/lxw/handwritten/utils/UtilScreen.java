@@ -1,4 +1,4 @@
-package com.lxw.handwritten;
+package com.lxw.handwritten.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
