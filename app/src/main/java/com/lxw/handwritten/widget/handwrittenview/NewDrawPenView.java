@@ -143,4 +143,8 @@ public class NewDrawPenView extends View {
         //这里处理的不太好 需要优化
         mCanvasCode=IPenConfig.STROKE_TYPE_PEN;
     }
+
+    public void setPaintColor(int color) {
+        mPaint.setColor(color);
+    }
 }
