@@ -1,6 +1,7 @@
 package com.lxw.handwritten;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -173,7 +174,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.color:
+                MaterialDialog.Builder colorsBuilder = new MaterialDialog.Builder(this)
+                        .title("字体颜色")
+                        .negativeText("取消");
                 View customView = getLayoutInflater().inflate(R.layout.view_choose_color, null);
+                colorsBuilder.customView(customView, true);
+                final Dialog colorsDialog = colorsBuilder.build();
                 RecyclerView colorsRecyclerView = customView.findViewById(R.id.colorsRecyclerView);
                 colorsRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
                 List<Integer> colors = new ArrayList<>();
@@ -195,22 +201,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                         drawPenView.setPaintColor((Integer) adapter.getData().get(position));
                         UtilSharedPreference.getInstance(MainActivity.this).setValue(Constants.KEY_DEFAULT_PAINT_COLOR, (Integer) adapter.getData().get(position));
+                        colorsDialog.dismiss();
                     }
                 });
-                new MaterialDialog.Builder(this)
-                        .title("字体颜色")
-                        .customView(customView, true)
-                        .positiveText("确定")
-                        .negativeText("取消")
-                        .show();
+                colorsRecyclerView.setAdapter(colorsAdapter);
+                colorsDialog.show();
                 break;
             case R.id.confirm:
                 if (isConfirm) {
                     confirmBtn.setText("完成");
                     drawPenView.setVisibility(View.VISIBLE);
+                    resetBtn.setVisibility(View.VISIBLE);
+                    colorBtn.setVisibility(View.VISIBLE);
+                    newLineBtn.setVisibility(View.VISIBLE);
+                    deleteBtn.setVisibility(View.VISIBLE);
                 } else {
                     confirmBtn.setText("编辑");
                     drawPenView.setVisibility(View.GONE);
+                    resetBtn.setVisibility(View.GONE);
+                    colorBtn.setVisibility(View.GONE);
+                    newLineBtn.setVisibility(View.GONE);
+                    deleteBtn.setVisibility(View.GONE);
                 }
                 isConfirm = !isConfirm;
                 break;
