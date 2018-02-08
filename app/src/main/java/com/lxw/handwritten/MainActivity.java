@@ -7,14 +7,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -37,7 +42,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private RecyclerView charactersRecyclerView;
     private NewDrawPenView drawPenView;
-    private Button resetBtn, colorBtn, confirmBtn, newLineBtn, deleteBtn;
+    private LinearLayout operateLayout;
+    private ImageView previewImage;
+    private NestedScrollView charactersScrollView;
+    private Button resetBtn, colorBtn, confirmBtn, newLineBtn, deleteBtn, previewBtn;
     private List<Bitmap> characterBitmaps;
     private BaseQuickAdapter<Bitmap, BaseViewHolder> adapter;
     private static final int MSG_ADD_CHARACTER = 1000;
@@ -56,9 +64,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d("MSG_ADD_CHARACTER", "" + (int)left + (int)right + (int)top + (int)bottom);
                     Bitmap bitmap = UtilBitmap.getViewBitmap(drawPenView, left, right, top, bottom);
                     bitmap = UtilBitmap.compress(bitmap, targetWidth, targetHeight);
-                    adapter.addData(bitmap);
+                    adapter.addData(adapter.getData().size() - 1, bitmap);
                     drawPenView.setCanvasCode(IPenConfig.STROKE_TYPE_ERASER);
                     isDrawPenViewReset = true;
+                    charactersScrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            charactersScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    });
                     break;
             }
         }
@@ -76,22 +90,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int spanCount = Constants.RECYCLERVIEW_SPAN_COUNT;
         screenWidth = UtilScreen.getScreenWidth(this);
         screenHeight = UtilScreen.getScreenHeight(this);
-        targetWidth = (screenWidth - (spanCount + 1) *
-                getResources().getDimensionPixelSize(R.dimen.dp_6)) / spanCount;
+        targetWidth = (screenWidth - 2 * getResources().getDimensionPixelSize(R.dimen.dp_10) - 2 *
+                spanCount * getResources().getDimensionPixelSize(R.dimen.dp_3)) / spanCount;
         targetHeight = (int) (targetWidth / Constants.CHARACTER_WIDTH_HEIGHT_SCALE);
         charactersRecyclerView = findViewById(R.id.charactersRecyclerView);
         drawPenView = findViewById(R.id.drawPenView);
+        operateLayout = findViewById(R.id.operateLayout);
+        previewImage = findViewById(R.id.previewImage);
+        charactersScrollView = findViewById(R.id.charactersScrollView);
         resetBtn = findViewById(R.id.reset);
         colorBtn = findViewById(R.id.color);
         confirmBtn = findViewById(R.id.confirm);
         newLineBtn = findViewById(R.id.newLine);
         deleteBtn = findViewById(R.id.delete);
+        previewBtn = findViewById(R.id.preview);
         resetBtn.setOnClickListener(this);
         colorBtn.setOnClickListener(this);
         confirmBtn.setOnClickListener(this);
         newLineBtn.setOnClickListener(this);
         deleteBtn.setOnClickListener(this);
+        previewBtn.setOnClickListener(this);
         characterBitmaps = new ArrayList<>();
+        characterBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
         charactersRecyclerView.setLayoutManager(new GridLayoutManager(this, Constants.RECYCLERVIEW_SPAN_COUNT){
 
             @Override
@@ -102,12 +122,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter = new BaseQuickAdapter<Bitmap, BaseViewHolder>(R.layout.item_character, characterBitmaps) {
             @Override
             protected void convert(BaseViewHolder helper, Bitmap item) {
-                helper.getView(R.id.imageView).setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, targetHeight));
-                helper.setImageBitmap(R.id.imageView, item);
+
+                if (!isConfirm && helper.getPosition() == getData().size() - 1) {
+                    helper.getView(R.id.imageView).setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT, targetHeight));
+                    Animation cursorAnim = AnimationUtils.loadAnimation(MainActivity.this,
+                            R.anim.cursor_invest_alpha);
+                    helper.setImageResource(R.id.imageView, R.drawable.ic_cursor);
+                    helper.getView(R.id.imageView).startAnimation(cursorAnim);
+                } else{
+                    helper.getView(R.id.imageView).setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, targetHeight));
+                    helper.setImageBitmap(R.id.imageView, item);
+                    helper.getView(R.id.imageView).clearAnimation();
+                }
             }
         };
+        charactersRecyclerView.setNestedScrollingEnabled(false);
         charactersRecyclerView.setAdapter(adapter);
-        drawPenView.setPaintColor(UtilSharedPreference.getInstance(this).getIntValue(Constants.KEY_DEFAULT_PAINT_COLOR, getResources().getColor(R.color.colorBlack)));
+        drawPenView.setPaintColor(UtilSharedPreference.getInstance(this).getIntValue(Constants.KEY_DEFAULT_PAINT_COLOR,
+                getResources().getColor(R.color.colorBlack)));
         drawPenView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -151,14 +185,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (top < 0) top = 0;
         else if (top > screenHeight * Constants.PADDING_HEIGHT_SCALE) top = screenHeight * Constants.PADDING_HEIGHT_SCALE;
         if (bottom < event.getY()) bottom = event.getY() + penPadding;
-        if (bottom > screenHeight) bottom = screenHeight;
+        if (bottom > screenHeight - operateLayout.getHeight()) bottom = screenHeight - operateLayout.getHeight();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset:
-                if (!adapter.getData().isEmpty()) {
+                if (adapter.getData().size() > 1) {
                     new MaterialDialog.Builder(this)
                             .title("随手输入")
                             .positiveText("确定")
@@ -166,7 +200,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    adapter.setNewData(null);
+                                    characterBitmaps.clear();
+                                    characterBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
+                                    adapter.setNewData(characterBitmaps);
                                 }
                             })
                             .content("当前操作会清空所有随写，是否继续？")
@@ -189,7 +225,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 colors.add(getResources().getColor(R.color.colorGray));
                 colors.add(getResources().getColor(R.color.colorYellow));
                 colors.add(getResources().getColor(R.color.colorGreen));
-                BaseQuickAdapter<Integer, BaseViewHolder> colorsAdapter = new BaseQuickAdapter<Integer, BaseViewHolder>(R.layout.item_color, colors ) {
+                BaseQuickAdapter<Integer, BaseViewHolder> colorsAdapter = new BaseQuickAdapter<Integer,
+                        BaseViewHolder>(R.layout.item_color, colors ) {
 
                     @Override
                     protected void convert(BaseViewHolder helper, Integer item) {
@@ -200,7 +237,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                         drawPenView.setPaintColor((Integer) adapter.getData().get(position));
-                        UtilSharedPreference.getInstance(MainActivity.this).setValue(Constants.KEY_DEFAULT_PAINT_COLOR, (Integer) adapter.getData().get(position));
+                        UtilSharedPreference.getInstance(MainActivity.this).setValue(Constants.KEY_DEFAULT_PAINT_COLOR,
+                                (Integer) adapter.getData().get(position));
                         colorsDialog.dismiss();
                     }
                 });
@@ -215,6 +253,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     colorBtn.setVisibility(View.VISIBLE);
                     newLineBtn.setVisibility(View.VISIBLE);
                     deleteBtn.setVisibility(View.VISIBLE);
+                    previewBtn.setVisibility(View.GONE);
+                    adapter.addData(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
                 } else {
                     confirmBtn.setText("编辑");
                     drawPenView.setVisibility(View.GONE);
@@ -222,20 +262,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     colorBtn.setVisibility(View.GONE);
                     newLineBtn.setVisibility(View.GONE);
                     deleteBtn.setVisibility(View.GONE);
+                    previewBtn.setVisibility(View.VISIBLE);
+                    if (adapter.getData().size() > 1) adapter.remove(adapter.getData().size() - 1);
                 }
                 isConfirm = !isConfirm;
+                if (!adapter.getData().isEmpty()) {
+                    charactersScrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            charactersScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    });
+                }
+                previewImage.setVisibility(View.GONE);
                 break;
             case R.id.newLine:
-                List<Bitmap> originData = adapter.getData();
-                int targetPosition = (originData.size() / Constants.RECYCLERVIEW_SPAN_COUNT + 1 ) * Constants.RECYCLERVIEW_SPAN_COUNT;
-                List<Bitmap> emptyBitmaps = new ArrayList<>();
-                for (int i = originData.size(); i < targetPosition; i++) {
-                    emptyBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
+                if (!charactersRecyclerView.isAnimating()) {
+                    List<Bitmap> originData = adapter.getData();
+                    int targetPosition = (originData.size() / Constants.RECYCLERVIEW_SPAN_COUNT + 1 ) *
+                            Constants.RECYCLERVIEW_SPAN_COUNT + 1;
+                    List<Bitmap> emptyBitmaps = new ArrayList<>();
+                    for (int i = originData.size(); i < targetPosition; i++) {
+                        emptyBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
+                    }
+                    adapter.addData(adapter.getData().size() - 1, emptyBitmaps);
+                    charactersScrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            charactersScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    });
                 }
-                adapter.addData(emptyBitmaps);
                 break;
             case R.id.delete:
-                if (!adapter.getData().isEmpty()) adapter.remove(adapter.getData().size() - 1);
+                if (adapter.getData().size() > 1 && !charactersRecyclerView.isAnimating()) {
+                    adapter.remove(adapter.getData().size() - 2);
+                    charactersScrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            charactersScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    });
+                }
+                break;
+                case R.id.preview:
+                    previewImage.setImageBitmap(UtilBitmap.getScrollViewBitmap(charactersScrollView));
+                    previewImage.setVisibility(View.VISIBLE);
                 break;
         }
     }

@@ -65,6 +65,7 @@ public class NewDrawPenView extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);//连接处元
         mPaint.setAlpha(0xFF);
         mPaint.setAntiAlias(true);
+        mPaint.setFilterBitmap(true);
         mPaint.setStrokeMiter(1.0f);
         mStokeBrushPen.setPaint(mPaint);
     }

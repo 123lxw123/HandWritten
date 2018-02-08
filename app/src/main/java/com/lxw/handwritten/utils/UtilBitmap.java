@@ -1,7 +1,10 @@
 package com.lxw.handwritten.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.support.v4.widget.NestedScrollView;
 import android.view.View;
 
 /**
@@ -28,7 +31,7 @@ public class UtilBitmap {
         view.buildDrawingCache();
         Bitmap bitmap = view.getDrawingCache();
         try {
-            bitmap = Bitmap.createBitmap(bitmap, (int) left, (int) top, (int) (right - left), (int) (bottom - top));
+            bitmap = Bitmap.createBitmap(bitmap, (int) left, (int) top, (int) (right - left), (int) (bottom - top), null, true);
 
             return bitmap;
         }catch (Exception e) {
@@ -51,11 +54,29 @@ public class UtilBitmap {
                 Matrix matrix = new Matrix();
                 matrix.postScale(scale, scale);
                 // 产生缩放后的Bitmap对象
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, false);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return bitmap;
+    }
+
+    /**
+     * NestedScrollView截屏
+     * @param scrollView 要截图的NestedScrollView
+     * @return Bitmap
+     */
+    public static Bitmap getScrollViewBitmap(NestedScrollView scrollView) {
+        int h = 0;
+        Bitmap bitmap;
+        for (int i = 0; i < scrollView.getChildCount(); i++) {
+            h += scrollView.getChildAt(i).getHeight();
+            scrollView.getChildAt(i).setBackgroundColor(Color.parseColor("#ffffff"));
+        }
+        bitmap = Bitmap.createBitmap(scrollView.getWidth(), h, Bitmap.Config.RGB_565);
+        final Canvas canvas = new Canvas(bitmap);
+        scrollView.draw(canvas);
         return bitmap;
     }
 
