@@ -3,6 +3,7 @@ package com.lxw.handwritten;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -133,7 +134,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else{
                     helper.getView(R.id.imageView).setLayoutParams(new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT, targetHeight));
-                    helper.setImageBitmap(R.id.imageView, item);
+                    BitmapDrawable drawable = new BitmapDrawable(item);
+                    drawable.setAntiAlias(true);
+                    drawable.setFilterBitmap(true);
+                    helper.setImageDrawable(R.id.imageView, drawable);
                     helper.getView(R.id.imageView).clearAnimation();
                 }
             }
@@ -176,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void measureBitmapRectangle(MotionEvent event){
         // TODO 最小矩形要添加笔锋宽度的一半
-        int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_10);
+        int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_20);
         if (left > event.getX()) left = event.getX() - penPadding;
         if (left < 0) left = 0;
         if (right < event.getX()) right = event.getX() + penPadding;
@@ -263,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     newLineBtn.setVisibility(View.GONE);
                     deleteBtn.setVisibility(View.GONE);
                     previewBtn.setVisibility(View.VISIBLE);
-                    if (adapter.getData().size() > 1) adapter.remove(adapter.getData().size() - 1);
+                    if (adapter.getData().size() > 0) adapter.remove(adapter.getData().size() - 1);
                 }
                 isConfirm = !isConfirm;
                 if (!adapter.getData().isEmpty()) {
