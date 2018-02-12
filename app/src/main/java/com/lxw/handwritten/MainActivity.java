@@ -3,7 +3,6 @@ package com.lxw.handwritten;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -134,10 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else{
                     helper.getView(R.id.imageView).setLayoutParams(new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT, targetHeight));
-                    BitmapDrawable drawable = new BitmapDrawable(item);
-                    drawable.setAntiAlias(true);
-                    drawable.setFilterBitmap(true);
-                    helper.setImageDrawable(R.id.imageView, drawable);
+                    helper.setImageBitmap(R.id.imageView, item);
                     helper.getView(R.id.imageView).clearAnimation();
                 }
             }
@@ -147,17 +143,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawPenView.setPaintColor(UtilSharedPreference.getInstance(this).getIntValue(Constants.KEY_DEFAULT_PAINT_COLOR,
                 getResources().getColor(R.color.colorBlack)));
         drawPenView.setOnTouchListener(new View.OnTouchListener() {
-
+            int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_20);
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case ACTION_DOWN:
                         handler.removeCallbacksAndMessages(null);
                         if (isDrawPenViewReset){
-                            left = event.getX();
-                            right = event.getX();
-                            top = event.getY();
-                            bottom = event.getY();
+                            left = event.getX() - penPadding;
+                            right = event.getX() + penPadding;
+                            top = event.getY() - penPadding;
+                            bottom = event.getY() + penPadding;
                             isDrawPenViewReset = false;
                         } else {
                             measureBitmapRectangle(event);
@@ -181,15 +177,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void measureBitmapRectangle(MotionEvent event){
         // TODO 最小矩形要添加笔锋宽度的一半
         int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_20);
-        if (left > event.getX()) left = event.getX() - penPadding;
+        if (left > event.getX()  - penPadding) left = event.getX() - penPadding;
         if (left < 0) left = 0;
-        if (right < event.getX()) right = event.getX() + penPadding;
+        if (right < event.getX() + penPadding) right = event.getX() + penPadding;
         if (right > screenWidth) right = screenWidth;
-        if (top > event.getY()) top = event.getY() - penPadding;
+        if (top > event.getY() - penPadding) top = event.getY() - penPadding;
         if (top < 0) top = 0;
-        else if (top > screenHeight * Constants.PADDING_HEIGHT_SCALE) top = screenHeight * Constants.PADDING_HEIGHT_SCALE;
-        if (bottom < event.getY()) bottom = event.getY() + penPadding;
-        if (bottom > screenHeight - operateLayout.getHeight()) bottom = screenHeight - operateLayout.getHeight();
+        else if (top > drawPenView.getHeight() * Constants.PADDING_HEIGHT_SCALE) top = drawPenView.getHeight() * Constants.PADDING_HEIGHT_SCALE;
+        if (bottom < event.getY()  + penPadding) bottom = event.getY() + penPadding;
+        if (bottom > drawPenView.getHeight() - operateLayout.getHeight()) bottom = drawPenView.getHeight() - operateLayout.getHeight();
     }
 
     @Override

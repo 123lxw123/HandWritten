@@ -31,13 +31,12 @@ public class UtilBitmap {
         view.buildDrawingCache();
         Bitmap bitmap = view.getDrawingCache();
         try {
-            bitmap = Bitmap.createBitmap(bitmap, (int) left, (int) top, (int) (right - left), (int) (bottom - top), null, true);
-
-            return bitmap;
+            return Bitmap.createBitmap(bitmap, (int) left, (int) top, (int) (right - left), (int) (bottom - top), null, true);
         }catch (Exception e) {
             e.printStackTrace();
         } finally {
             view.destroyDrawingCache();
+//            bitmap.recycle();
         }
         return null;
     }
@@ -50,14 +49,16 @@ public class UtilBitmap {
             float scaleWidth = (float) targetWidth / bitmapWidth;
             float scaleHeight = (float) targetHeight / bitmapHeight;
             float scale = Math.max(scaleWidth, scaleHeight);
-            if (scale > 1f){
+            if (scale < 1f){
                 Matrix matrix = new Matrix();
-                matrix.postScale(scale, scale);
+                matrix.setScale(scale, scale);
                 // 产生缩放后的Bitmap对象
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
+                return Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+//            bitmap.recycle();
         }
         return bitmap;
     }
