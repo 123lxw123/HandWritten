@@ -219,40 +219,40 @@ public abstract class BasePenExtend extends BasePen {
      */
     public double calcNewWidth(double curVel, double lastVel, double curDis,
                                 double factor, double lastWidth) {
-//        double calVel = curVel * 0.6 + lastVel * (1 - 0.6);
-//        //返回指定数字的自然对数
-//        //手指滑动的越快，这个值越小，为负数
-//        double vfac = Math.log(factor * 2.0f) * (-calVel);
-//        //此方法返回值e，其中e是自然对数的基数。
-//        //Math.exp(vfac) 变化范围为0 到1 当手指没有滑动的时候 这个值为1 当滑动很快的时候无线趋近于0
-//        //在次说明下，当手指抬起来，这个值会变大，这也就说明，抬起手太慢的话，笔锋效果不太明显
-//        //这就说明为什么笔锋的效果不太明显
-//        double calWidth = mBaseWidth * Math.exp(vfac);
-//        //滑动的速度越快的话，mMoveThres也越大
-//        double mMoveThres = curDis * 0.01f;
-//        //对之值最大的地方进行控制
-//        if (mMoveThres > IPenConfig.WIDTH_THRES_MAX) {
-//            mMoveThres = IPenConfig.WIDTH_THRES_MAX;
-//        }
-//        //滑动的越快的话，第一个判断会走
-//        if (Math.abs(calWidth - mBaseWidth) / mBaseWidth > mMoveThres) {
-//
-//            if (calWidth > mBaseWidth) {
-//                calWidth = mBaseWidth * (1 + mMoveThres);
-//            } else {
-//                calWidth = mBaseWidth * (1 - mMoveThres);
-//            }
-//            //滑动的越慢的话，第二个判断会走
-//        } else if (Math.abs(calWidth - lastWidth) / lastWidth > mMoveThres) {
-//
-//            if (calWidth > lastWidth) {
-//                calWidth = lastWidth * (1 + mMoveThres);
-//            } else {
-//                calWidth = lastWidth * (1 - mMoveThres);
-//            }
-//        }
-//        if (calWidth < 40) calWidth = 40;
-        return 40;
+        double calVel = curVel * 0.6 + lastVel * (1 - 0.6);
+        //返回指定数字的自然对数
+        //手指滑动的越快，这个值越小，为负数
+        double vfac = Math.log(factor * 2.0f) * (-calVel);
+        //此方法返回值e，其中e是自然对数的基数。
+        //Math.exp(vfac) 变化范围为0 到1 当手指没有滑动的时候 这个值为1 当滑动很快的时候无线趋近于0
+        //在次说明下，当手指抬起来，这个值会变大，这也就说明，抬起手太慢的话，笔锋效果不太明显
+        //这就说明为什么笔锋的效果不太明显
+        double calWidth = mBaseWidth * Math.exp(vfac);
+        //滑动的速度越快的话，mMoveThres也越大
+        double mMoveThres = curDis * 0.01f;
+        //对之值最大的地方进行控制
+        if (mMoveThres > IPenConfig.WIDTH_THRES_MAX) {
+            mMoveThres = IPenConfig.WIDTH_THRES_MAX;
+        }
+        //滑动的越快的话，第一个判断会走
+        if (Math.abs(calWidth - mBaseWidth) / mBaseWidth > mMoveThres) {
+
+            if (calWidth > mBaseWidth) {
+                calWidth = mBaseWidth * (1 + mMoveThres);
+            } else {
+                calWidth = mBaseWidth * (1 - mMoveThres);
+            }
+            //滑动的越慢的话，第二个判断会走
+        } else if (Math.abs(calWidth - lastWidth) / lastWidth > mMoveThres) {
+
+            if (calWidth > lastWidth) {
+                calWidth = lastWidth * (1 + mMoveThres);
+            } else {
+                calWidth = lastWidth * (1 - mMoveThres);
+            }
+        }
+        if (calWidth < 20) calWidth = 20;
+        return calWidth;
     }
 
     /**
