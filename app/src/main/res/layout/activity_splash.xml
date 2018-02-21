@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.lxw.handwritten.SplashActivity">
+
+    <ImageView
+        android:id="@+id/characters"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_0"/>
+
+    <LinearLayout
+        android:padding="@dimen/dp_10"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_60">
+
+        <Button
+            android:id="@+id/style1"
+            android:layout_weight="1"
+            android:text="风格1"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="match_parent"/>
+
+        <Button
+            android:id="@+id/style2"
+            android:layout_weight="1"
+            android:text="风格2"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="match_parent"/>
+
+        <Button
+            android:id="@+id/style3"
+            android:layout_weight="1"
+            android:text="风格3"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+</LinearLayout>

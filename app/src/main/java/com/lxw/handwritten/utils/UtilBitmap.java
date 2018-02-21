@@ -14,7 +14,7 @@ import android.view.View;
 public class UtilBitmap {
 
     public static Bitmap getViewBitmap(View view) {
-        return getViewBitmap(view, 0, 0, view.getWidth(), view.getHeight());
+        return getViewBitmap(view, 0, view.getWidth(), 0, view.getHeight());
     }
 
     /**
@@ -78,6 +78,17 @@ public class UtilBitmap {
         bitmap = Bitmap.createBitmap(scrollView.getWidth(), h, Bitmap.Config.RGB_565);
         final Canvas canvas = new Canvas(bitmap);
         scrollView.draw(canvas);
+        return bitmap;
+    }
+
+    public static Bitmap getRotationBitmap(Bitmap bitmap, int angle) {
+        Matrix matrix = new Matrix();
+        matrix.setRotate(angle, (float) bitmap.getWidth() / 2, (float) bitmap.getHeight() / 2);
+        try {
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+        }
         return bitmap;
     }
 

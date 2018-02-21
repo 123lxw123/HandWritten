@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import com.lxw.handwritten.Constants;
+
 import java.util.ArrayList;
 
 /**
@@ -109,6 +111,9 @@ public abstract class BasePenExtend extends BasePen {
             //如果是手指画的，我们取他的0.8
             mLastWidth = 0.8 * mBaseWidth;
         }
+//        if (mLastWidth < Constants.MIN_PEN_WIDTH) mLastWidth = Constants.MIN_PEN_WIDTH;
+//        if (mLastWidth > Constants.MAX_PEN_WIDTH) mLastWidth = Constants.MAX_PEN_WIDTH;
+        mLastWidth = Constants.MIN_PEN_WIDTH;
         //down下的点的宽度
         curPoint.width = (float) mLastWidth;
         mLastVel = 0;
@@ -184,7 +189,6 @@ public abstract class BasePenExtend extends BasePen {
         } else {
             mCurPoint.width = 0;
         }
-
         mPointList.add(mCurPoint);
 
         mBezier.addNode(mCurPoint);
@@ -251,7 +255,8 @@ public abstract class BasePenExtend extends BasePen {
                 calWidth = lastWidth * (1 - mMoveThres);
             }
         }
-        if (calWidth < 20) calWidth = 20;
+        if (calWidth < Constants.MIN_PEN_WIDTH) calWidth = Constants.MIN_PEN_WIDTH;
+        else if (calWidth > Constants.MAX_PEN_WIDTH) calWidth = Constants.MAX_PEN_WIDTH;
         return calWidth;
     }
 

@@ -2,6 +2,7 @@ package com.lxw.handwritten;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,13 +12,13 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
@@ -38,21 +39,19 @@ import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class SecondStyleActivity extends AppCompatActivity implements View.OnClickListener {
 
     private RecyclerView charactersRecyclerView;
     private NewDrawPenView drawPenView;
-    private LinearLayout operateLayout;
-    private ImageView previewImage;
     private NestedScrollView charactersScrollView;
-    private Button resetBtn, colorBtn, confirmBtn, newLineBtn, deleteBtn, previewBtn;
+    private Button resetBtn, colorBtn, confirmBtn, spaceBtn, newLineBtn, deleteBtn, saveBtn, cancelBtn;
     private List<Bitmap> characterBitmaps;
     private BaseQuickAdapter<Bitmap, BaseViewHolder> adapter;
     private static final int MSG_ADD_CHARACTER = 1000;
     private float left = 0f, right = 0f, top = 0f, bottom = 0f;
     private boolean isDrawPenViewReset = true;
     private boolean isConfirm = false;
-    private int targetWidth, targetHeight, screenWidth, screenHeight;
+    private int targetWidth, targetHeight, screenWidth;
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){
 
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_second_style);
         setUpView();
     }
 
@@ -89,29 +88,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setUpView() {
         int spanCount = Constants.RECYCLERVIEW_SPAN_COUNT;
         screenWidth = UtilScreen.getScreenWidth(this);
-        screenHeight = UtilScreen.getScreenHeight(this);
         targetWidth = (screenWidth - 2 * getResources().getDimensionPixelSize(R.dimen.dp_10) - 2 *
                 spanCount * getResources().getDimensionPixelSize(R.dimen.dp_3)) / spanCount;
         targetHeight = (int) (targetWidth / Constants.CHARACTER_WIDTH_HEIGHT_SCALE);
         charactersRecyclerView = findViewById(R.id.charactersRecyclerView);
         drawPenView = findViewById(R.id.drawPenView);
-        operateLayout = findViewById(R.id.operateLayout);
-        previewImage = findViewById(R.id.previewImage);
         charactersScrollView = findViewById(R.id.charactersScrollView);
         resetBtn = findViewById(R.id.reset);
         colorBtn = findViewById(R.id.color);
         confirmBtn = findViewById(R.id.confirm);
         newLineBtn = findViewById(R.id.newLine);
+        spaceBtn = findViewById(R.id.space);
         deleteBtn = findViewById(R.id.delete);
-        previewBtn = findViewById(R.id.preview);
+        saveBtn = findViewById(R.id.save);
+        cancelBtn = findViewById(R.id.cancel);
         resetBtn.setOnClickListener(this);
         colorBtn.setOnClickListener(this);
         confirmBtn.setOnClickListener(this);
+        spaceBtn.setOnClickListener(this);
         newLineBtn.setOnClickListener(this);
         deleteBtn.setOnClickListener(this);
-        previewBtn.setOnClickListener(this);
+        saveBtn.setOnClickListener(this);
+        cancelBtn.setOnClickListener(this);
         characterBitmaps = new ArrayList<>();
         characterBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
+        ((SimpleItemAnimator)charactersRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         charactersRecyclerView.setLayoutManager(new GridLayoutManager(this, Constants.RECYCLERVIEW_SPAN_COUNT){
 
             @Override
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!isConfirm && helper.getPosition() == getData().size() - 1) {
                     helper.getView(R.id.imageView).setLayoutParams(new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT, targetHeight));
-                    Animation cursorAnim = AnimationUtils.loadAnimation(MainActivity.this,
+                    Animation cursorAnim = AnimationUtils.loadAnimation(SecondStyleActivity.this,
                             R.anim.cursor_invest_alpha);
                     helper.setImageResource(R.id.imageView, R.drawable.ic_cursor);
                     helper.getView(R.id.imageView).startAnimation(cursorAnim);
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawPenView.setPaintColor(UtilSharedPreference.getInstance(this).getIntValue(Constants.KEY_DEFAULT_PAINT_COLOR,
                 getResources().getColor(R.color.colorBlack)));
         drawPenView.setOnTouchListener(new View.OnTouchListener() {
-            int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_20);
+            int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_10);
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -176,16 +177,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void measureBitmapRectangle(MotionEvent event){
         // TODO 最小矩形要添加笔锋宽度的一半
-        int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_20);
+        int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_10);
         if (left > event.getX()  - penPadding) left = event.getX() - penPadding;
         if (left < 0) left = 0;
         if (right < event.getX() + penPadding) right = event.getX() + penPadding;
-        if (right > screenWidth) right = screenWidth;
+        if (right > drawPenView.getWidth()) right = drawPenView.getWidth() ;
         if (top > event.getY() - penPadding) top = event.getY() - penPadding;
         if (top < 0) top = 0;
         else if (top > drawPenView.getHeight() * Constants.PADDING_HEIGHT_SCALE) top = drawPenView.getHeight() * Constants.PADDING_HEIGHT_SCALE;
         if (bottom < event.getY()  + penPadding) bottom = event.getY() + penPadding;
-        if (bottom > drawPenView.getHeight() - operateLayout.getHeight()) bottom = drawPenView.getHeight() - operateLayout.getHeight();
+        if (bottom > drawPenView.getHeight()) bottom = drawPenView.getHeight();
     }
 
     @Override
@@ -237,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                         drawPenView.setPaintColor((Integer) adapter.getData().get(position));
-                        UtilSharedPreference.getInstance(MainActivity.this).setValue(Constants.KEY_DEFAULT_PAINT_COLOR,
+                        UtilSharedPreference.getInstance(SecondStyleActivity.this).setValue(Constants.KEY_DEFAULT_PAINT_COLOR,
                                 (Integer) adapter.getData().get(position));
                         colorsDialog.dismiss();
                     }
@@ -251,18 +252,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     drawPenView.setVisibility(View.VISIBLE);
                     resetBtn.setVisibility(View.VISIBLE);
                     colorBtn.setVisibility(View.VISIBLE);
+                    spaceBtn.setVisibility(View.VISIBLE);
                     newLineBtn.setVisibility(View.VISIBLE);
                     deleteBtn.setVisibility(View.VISIBLE);
-                    previewBtn.setVisibility(View.GONE);
+                    saveBtn.setVisibility(View.GONE);
                     adapter.addData(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
                 } else {
                     confirmBtn.setText("编辑");
                     drawPenView.setVisibility(View.GONE);
                     resetBtn.setVisibility(View.GONE);
                     colorBtn.setVisibility(View.GONE);
+                    spaceBtn.setVisibility(View.GONE);
                     newLineBtn.setVisibility(View.GONE);
                     deleteBtn.setVisibility(View.GONE);
-                    previewBtn.setVisibility(View.VISIBLE);
+                    saveBtn.setVisibility(View.VISIBLE);
                     if (adapter.getData().size() > 0) adapter.remove(adapter.getData().size() - 1);
                 }
                 isConfirm = !isConfirm;
@@ -274,7 +277,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     });
                 }
-                previewImage.setVisibility(View.GONE);
+                break;
+            case R.id.space:
+                int index = 0;
+                if (adapter.getData().size() >= 1) index = adapter.getData().size() - 1;
+                adapter.addData(index, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
                 break;
             case R.id.newLine:
                 if (!charactersRecyclerView.isAnimating()) {
@@ -305,10 +312,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     });
                 }
                 break;
-                case R.id.preview:
-                    previewImage.setImageBitmap(UtilBitmap.getScrollViewBitmap(charactersScrollView));
-                    previewImage.setVisibility(View.VISIBLE);
+                case R.id.save:
+                    Intent intent = new Intent();
+                    Constants.characters = UtilBitmap.getScrollViewBitmap(charactersScrollView);
+                    setResult(AppCompatActivity.RESULT_OK, intent);
+                    finish();
                 break;
-        }
+            case R.id.cancel:
+                finish();
+                break;}
     }
 }

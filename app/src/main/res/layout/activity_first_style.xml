@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_0"
         android:layout_weight="1"
-        tools:context="com.lxw.handwritten.MainActivity">
+        tools:context="com.lxw.handwritten.FirstStyleActivity">
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/charactersScrollView"
@@ -28,13 +28,6 @@
             android:id="@+id/drawPenView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
-        <ImageView
-            android:id="@+id/previewImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#fff"
-            android:visibility="gone"/>
 
     </FrameLayout>
 
@@ -56,23 +49,24 @@
             android:id="@+id/color"
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/dp_10"
-            android:layout_marginRight="@dimen/dp_10"
+            android:layout_marginLeft="@dimen/dp_4"
+            android:layout_marginRight="@dimen/dp_4"
             android:layout_weight="1"
             android:text="颜色"/>
 
         <Button
-            android:id="@+id/confirm"
+            android:id="@+id/space"
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:text="完成"/>
+            android:layout_marginLeft="@dimen/dp_4"
+            android:layout_weight="1"
+            android:text="空格"/>
 
         <Button
             android:id="@+id/newLine"
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
             android:text="换行"/>
 
@@ -80,17 +74,32 @@
             android:id="@+id/delete"
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
             android:text="撤回"/>
 
         <Button
-            android:id="@+id/preview"
+            android:id="@+id/save"
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
-            android:text="预览"
+            android:text="保存"
             android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="完成"/>
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="取消"/>
+
     </LinearLayout>
 </LinearLayout>
