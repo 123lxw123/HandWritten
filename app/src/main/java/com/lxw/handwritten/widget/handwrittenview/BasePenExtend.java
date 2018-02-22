@@ -3,6 +3,7 @@ package com.lxw.handwritten.widget.handwrittenview;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lxw.handwritten.Constants;
@@ -255,6 +256,7 @@ public abstract class BasePenExtend extends BasePen {
                 calWidth = lastWidth * (1 - mMoveThres);
             }
         }
+        Log.d("calWidth", calWidth + "");
         if (calWidth < Constants.MIN_PEN_WIDTH) calWidth = Constants.MIN_PEN_WIDTH;
         else if (calWidth > Constants.MAX_PEN_WIDTH) calWidth = Constants.MAX_PEN_WIDTH;
         return calWidth;
