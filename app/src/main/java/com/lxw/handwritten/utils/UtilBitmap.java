@@ -73,9 +73,9 @@ public class UtilBitmap {
         Bitmap bitmap;
         for (int i = 0; i < scrollView.getChildCount(); i++) {
             h += scrollView.getChildAt(i).getHeight();
-            scrollView.getChildAt(i).setBackgroundColor(Color.parseColor("#ffffff"));
+            scrollView.getChildAt(i).setBackgroundColor(Color.parseColor("#00000000"));
         }
-        bitmap = Bitmap.createBitmap(scrollView.getWidth(), h, Bitmap.Config.RGB_565);
+        bitmap = Bitmap.createBitmap(scrollView.getWidth(), h, Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
         scrollView.draw(canvas);
         return bitmap;

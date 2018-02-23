@@ -6,36 +6,44 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <FrameLayout
+    <LinearLayout
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_0"
-        android:layout_weight="1"
-        tools:context="com.lxw.handwritten.FirstStyleActivity">
+        android:padding="@dimen/dp_2"
+        android:background="@drawable/bg_rectangle"
+        android:layout_weight="1">
 
-        <android.support.v4.widget.NestedScrollView
-            android:id="@+id/charactersScrollView"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/charactersRecyclerView"
+            <android.support.v4.widget.NestedScrollView
+                android:id="@+id/charactersScrollView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="@dimen/dp_10"/>
-        </android.support.v4.widget.NestedScrollView>
+                android:layout_height="match_parent">
 
-        <com.lxw.handwritten.widget.handwrittenview.NewDrawPenView
-            android:id="@+id/drawPenView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/charactersRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/dp_10"/>
+            </android.support.v4.widget.NestedScrollView>
 
-    </FrameLayout>
+            <com.lxw.handwritten.widget.handwrittenview.NewDrawPenView
+                android:id="@+id/drawPenView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </FrameLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/operateLayout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_60"
-        android:background="@color/colorPrimary"
         android:padding="@dimen/dp_10">
 
         <Button
@@ -43,6 +51,7 @@
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="@drawable/bg_round_rectangle"
             android:text="清空"/>
 
         <Button
@@ -50,8 +59,8 @@
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/dp_4"
-            android:layout_marginRight="@dimen/dp_4"
             android:layout_weight="1"
+            android:background="@drawable/bg_round_rectangle"
             android:text="颜色"/>
 
         <Button
@@ -60,6 +69,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
+            android:background="@drawable/bg_round_rectangle"
             android:text="空格"/>
 
         <Button
@@ -68,6 +78,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
+            android:background="@drawable/bg_round_rectangle"
             android:text="换行"/>
 
         <Button
@@ -76,6 +87,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
+            android:background="@drawable/bg_round_rectangle"
             android:text="撤回"/>
 
         <Button
@@ -84,6 +96,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
+            android:background="@drawable/bg_round_rectangle"
             android:text="保存"
             android:visibility="gone"/>
 
@@ -91,14 +104,18 @@
             android:id="@+id/confirm"
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
+            android:background="@drawable/bg_round_rectangle"
             android:text="完成"/>
 
         <Button
             android:id="@+id/cancel"
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/dp_4"
             android:layout_weight="1"
+            android:background="@drawable/bg_round_rectangle"
             android:text="取消"/>
 
     </LinearLayout>

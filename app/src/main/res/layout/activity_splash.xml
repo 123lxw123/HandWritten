@@ -10,18 +10,23 @@
 
     <ImageView
         android:id="@+id/characters"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
+        android:padding="@dimen/dp_2"
+        android:background="@drawable/bg_rectangle"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_0"/>
 
     <LinearLayout
         android:padding="@dimen/dp_10"
-        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_60">
 
         <Button
             android:id="@+id/style1"
+            android:background="@drawable/bg_round_rectangle"
             android:layout_weight="1"
             android:text="风格1"
             android:layout_width="@dimen/dp_0"
@@ -29,6 +34,8 @@
 
         <Button
             android:id="@+id/style2"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:background="@drawable/bg_round_rectangle"
             android:layout_weight="1"
             android:text="风格2"
             android:layout_width="@dimen/dp_0"
@@ -36,6 +43,8 @@
 
         <Button
             android:id="@+id/style3"
+            android:background="@drawable/bg_round_rectangle"
+            android:layout_marginLeft="@dimen/dp_10"
             android:layout_weight="1"
             android:text="风格3"
             android:layout_width="@dimen/dp_0"

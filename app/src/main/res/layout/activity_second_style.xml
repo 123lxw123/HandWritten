@@ -6,27 +6,37 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/charactersScrollView"
-        android:layout_weight="1"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_0">
+        android:layout_height="@dimen/dp_0"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_weight="1"
+        android:background="@drawable/bg_rectangle"
+        android:padding="@dimen/dp_2">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/charactersRecyclerView"
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/charactersScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="@dimen/dp_10"/>
-    </android.support.v4.widget.NestedScrollView>
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/charactersRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/dp_10"/>
+        </android.support.v4.widget.NestedScrollView>
+    </LinearLayout>
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_0"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_0">
+        android:padding="@dimen/dp_10">
 
         <FrameLayout
-            android:padding="@dimen/dp_6"
             android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
             android:layout_weight="1">
@@ -46,51 +56,62 @@
 
         <LinearLayout
             android:id="@+id/operateLayout"
-            android:orientation="vertical"
             android:layout_width="@dimen/dp_60"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimary">
+            android:layout_marginLeft="@dimen/dp_10"
+            android:orientation="vertical">
 
             <Button
                 android:id="@+id/reset"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_0"
                 android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
                 android:text="清空"/>
 
             <Button
                 android:id="@+id/color"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_0"
+                android:layout_marginTop="@dimen/dp_4"
                 android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
                 android:text="颜色"/>
 
             <Button
                 android:id="@+id/space"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_0"
+                android:layout_marginTop="@dimen/dp_4"
                 android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
                 android:text="空格"/>
 
             <Button
                 android:id="@+id/newLine"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_0"
+                android:layout_marginTop="@dimen/dp_4"
                 android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
                 android:text="换行"/>
 
             <Button
                 android:id="@+id/delete"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_0"
+                android:layout_marginTop="@dimen/dp_4"
                 android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
                 android:text="撤回"/>
 
             <Button
                 android:id="@+id/save"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_0"
+                android:layout_marginTop="@dimen/dp_4"
                 android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
                 android:text="保存"
                 android:visibility="gone"/>
 
@@ -98,14 +119,18 @@
                 android:id="@+id/confirm"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_0"
+                android:layout_marginTop="@dimen/dp_4"
                 android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
                 android:text="完成"/>
 
             <Button
                 android:id="@+id/cancel"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_0"
+                android:layout_marginTop="@dimen/dp_4"
                 android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
                 android:text="取消"/>
 
         </LinearLayout>
