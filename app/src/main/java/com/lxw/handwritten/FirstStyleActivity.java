@@ -16,6 +16,7 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -43,6 +44,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
 
     private RecyclerView charactersRecyclerView;
     private NewDrawPenView drawPenView;
+    private LinearLayout background;
     private NestedScrollView charactersScrollView;
     private Button resetBtn, colorBtn, confirmBtn, spaceBtn, newLineBtn, deleteBtn, saveBtn, cancelBtn;
     private List<Bitmap> characterBitmaps;
@@ -110,6 +112,25 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
         deleteBtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
+        // 虚线背景
+        background = findViewById(R.id.background);
+        background.post(new Runnable() {
+            @Override
+            public void run() {
+                background.removeAllViews();
+                for (int i = 0; i < background.getHeight() / targetHeight; i++) {
+                    View view = new View(FirstStyleActivity.this);
+                    view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.dp_1));
+                    if (i == 0) layoutParams.setMargins(0, (int) (targetHeight + getResources().getDimensionPixelSize(R.dimen.dp_1) * 5), 0, 0);
+                    else layoutParams.setMargins(0, (int) (targetHeight + getResources().getDimensionPixelSize(R.dimen.dp_1) * 4.5), 0, 0);
+                    view.setLayoutParams(layoutParams);
+                    view.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_dashed));
+                    background.addView(view);
+                }
+            }
+        });
         characterBitmaps = new ArrayList<>();
         characterBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
         ((SimpleItemAnimator)charactersRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
