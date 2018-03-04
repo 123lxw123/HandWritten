@@ -48,7 +48,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
     private EditText editCharacters;
     private NewDrawPenView drawPenView;
     private RelativeLayout background;
-    private Button resetBtn, colorBtn, confirmBtn, spaceBtn, newLineBtn, deleteBtn, saveBtn, cancelBtn;
+    private Button resetBtn, colorBtn, sizeBtn, confirmBtn, spaceBtn, newLineBtn, deleteBtn, saveBtn, cancelBtn;
     private static final int MSG_ADD_CHARACTER = 1000;
     private float left = 0f, right = 0f, top = 0f, bottom = 0f;
     private boolean isDrawPenViewReset = true;
@@ -85,6 +85,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
         drawPenView = findViewById(R.id.drawPenView);
         resetBtn = findViewById(R.id.reset);
         colorBtn = findViewById(R.id.color);
+        sizeBtn = findViewById(R.id.size);
         confirmBtn = findViewById(R.id.confirm);
         newLineBtn = findViewById(R.id.newLine);
         spaceBtn = findViewById(R.id.space);
@@ -93,6 +94,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
         cancelBtn = findViewById(R.id.cancel);
         resetBtn.setOnClickListener(this);
         colorBtn.setOnClickListener(this);
+        sizeBtn.setOnClickListener(this);
         confirmBtn.setOnClickListener(this);
         spaceBtn.setOnClickListener(this);
         newLineBtn.setOnClickListener(this);
@@ -246,6 +248,47 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
                 colorsRecyclerView.setAdapter(colorsAdapter);
                 colorsDialog.show();
                 break;
+            case R.id.size:
+                MaterialDialog.Builder sizesBuilder = new MaterialDialog.Builder(this)
+                        .title("笔锋粗细")
+                        .negativeText("取消");
+                View customSizeView = getLayoutInflater().inflate(R.layout.view_choose_color, null);
+                sizesBuilder.customView(customSizeView, true);
+                final Dialog sizesDialog = sizesBuilder.build();
+                RecyclerView sizesRecyclerView = customSizeView.findViewById(R.id.colorsRecyclerView);
+                sizesRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+                List<Integer> sizes = new ArrayList<>();
+                sizes.add(drawPenView.getPaintColor());
+                sizes.add(drawPenView.getPaintColor());
+                sizes.add(drawPenView.getPaintColor());
+                BaseQuickAdapter<Integer, BaseViewHolder> sizesAdapter = new BaseQuickAdapter<Integer,
+                        BaseViewHolder>(R.layout.item_color, sizes ) {
+
+                    @Override
+                    protected void convert(BaseViewHolder helper, Integer item) {
+                        helper.setBackgroundColor(R.id.colorLayout, item);
+                        helper.getView(R.id.colorLayout).getLayoutParams().width = getResources().getDimensionPixelSize(R.dimen.dp_30) +
+                                helper.getAdapterPosition() * getResources().getDimensionPixelSize(R.dimen.dp_6);
+                        helper.getView(R.id.colorLayout).getLayoutParams().height = getResources().getDimensionPixelSize(R.dimen.dp_30) +
+                                helper.getAdapterPosition() * getResources().getDimensionPixelSize(R.dimen.dp_6);
+                    }
+                };
+                sizesAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                        Constants.MIN_PEN_WIDTH = Constants.DEFAULT_MIN_PEN_WIDTH + position * 20;
+                        Constants.MAX_PEN_WIDTH= Constants.DEFAULT_MAX_PEN_WIDTH + position * 20;
+                        Constants.PEN_WIDTH = Constants.DEFAULT_PEN_WIDTH + position * 20;
+                        UtilSharedPreference.getInstance(getApplicationContext()).setValue(Constants.KEY_MIN_PEN_WIDTH, Constants.MIN_PEN_WIDTH);
+                        UtilSharedPreference.getInstance(getApplicationContext()).setValue(Constants.KEY_MAX_PEN_WIDTH, Constants.MAX_PEN_WIDTH);
+                        UtilSharedPreference.getInstance(getApplicationContext()).setValue(Constants.KEY_PEN_WIDTH, Constants.PEN_WIDTH);
+                        drawPenView.setPaintWidth(Constants.PEN_WIDTH);
+                        sizesDialog.dismiss();
+                    }
+                });
+                sizesRecyclerView.setAdapter(sizesAdapter);
+                sizesDialog.show();
+                break;
             case R.id.confirm:
                 if (isConfirm) {
                     confirmBtn.setText("完成");
@@ -253,6 +296,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
                     drawPenView.setVisibility(View.VISIBLE);
                     resetBtn.setVisibility(View.VISIBLE);
                     colorBtn.setVisibility(View.VISIBLE);
+                    sizeBtn.setVisibility(View.VISIBLE);
                     spaceBtn.setVisibility(View.VISIBLE);
                     newLineBtn.setVisibility(View.VISIBLE);
                     deleteBtn.setVisibility(View.VISIBLE);
@@ -263,6 +307,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
                     drawPenView.setVisibility(View.GONE);
                     resetBtn.setVisibility(View.GONE);
                     colorBtn.setVisibility(View.GONE);
+                    sizeBtn.setVisibility(View.GONE);
                     spaceBtn.setVisibility(View.GONE);
                     newLineBtn.setVisibility(View.GONE);
                     deleteBtn.setVisibility(View.GONE);

@@ -7,6 +7,7 @@ import android.graphics.RectF;
 
 import static com.lxw.handwritten.widget.handwrittenview.IPenConfig.STEPFACTOR;
 
+
 /**
  * @version v1.0 create at 2017/10/17
  * @des 钢笔

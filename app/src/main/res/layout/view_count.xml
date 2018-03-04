@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:paddingRight="@dimen/dp_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+        android:id="@+id/tvFirstCount"
+        android:gravity="center"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:text="风格1"
+        android:layout_weight="1"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tvSecondCount"
+            android:gravity="center"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:text="风格2"
+            android:layout_weight="1"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tvThirdCount"
+            android:gravity="center"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:text="风格3"
+            android:layout_weight="1"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:paddingRight="@dimen/dp_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etFirstCount"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_weight="1"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/etSecondCount"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_weight="1"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/etThirdCount"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_weight="1"
+            android:layout_width="@dimen/dp_0"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -15,7 +15,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import static com.lxw.handwritten.widget.handwrittenview.IPenConfig.PEN_WIDTH;
+import com.lxw.handwritten.Constants;
 
 
 /**
@@ -57,10 +57,10 @@ public class NewDrawPenView extends View {
     }
 
 
-    private void initPaint() {
+    public void initPaint() {
         mPaint = new Paint();
         mPaint.setColor(IPenConfig.PEN_CORLOUR);
-        mPaint.setStrokeWidth(PEN_WIDTH);
+        mPaint.setStrokeWidth(Constants.PEN_WIDTH);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeCap(Paint.Cap.ROUND);//结束的笔画为圆心
         mPaint.setStrokeJoin(Paint.Join.ROUND);//连接处元
@@ -150,5 +150,13 @@ public class NewDrawPenView extends View {
 
     public void setPaintColor(int color) {
         mPaint.setColor(color);
+    }
+
+    public int getPaintColor() {
+        return mPaint.getColor();
+    }
+
+    public void setPaintWidth(int width) {
+        mPaint.setStrokeWidth(width);
     }
 }

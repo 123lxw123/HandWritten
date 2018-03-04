@@ -85,6 +85,15 @@
                 android:text="颜色"/>
 
             <Button
+                android:id="@+id/size"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_0"
+                android:layout_marginTop="@dimen/dp_4"
+                android:layout_weight="1"
+                android:background="@drawable/bg_round_rectangle"
+                android:text="粗细"/>
+
+            <Button
                 android:id="@+id/space"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dp_0"
