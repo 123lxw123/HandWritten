@@ -17,7 +17,7 @@
         android:background="@drawable/bg_rectangle"
         android:padding="@dimen/dp_2">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/background"
             android:orientation="vertical"
             android:layout_width="match_parent"

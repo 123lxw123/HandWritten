@@ -11,13 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.lxw.handwritten.utils.UtilBitmap;
-import com.lxw.handwritten.utils.UtilScreen;
 import com.lxw.handwritten.utils.UtilSharedPreference;
 import com.lxw.handwritten.widget.handwrittenview.IPenConfig;
 import com.lxw.handwritten.widget.handwrittenview.NewDrawPenView;
@@ -25,11 +25,12 @@ import com.lxw.handwritten.widget.handwrittenview.NewDrawPenView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lxw.handwritten.Constants.THIRD_HEIGHT_SPAN_COUNT;
+
 public class ThirdStyleActivity extends AppCompatActivity implements View.OnClickListener {
 
     private NewDrawPenView drawPenView;
-    private LinearLayout background;
-    private int targetWidth, targetHeight, screenWidth;
+    private RelativeLayout background;
     private Button resetBtn, colorBtn, saveBtn, cancelBtn;
 
     @Override
@@ -49,24 +50,17 @@ public class ThirdStyleActivity extends AppCompatActivity implements View.OnClic
         colorBtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
-        // 虚线背景
-        int spanCount = Constants.RECYCLERVIEW_SPAN_COUNT;
-        screenWidth = UtilScreen.getScreenHeight(this);
-        targetWidth = (screenWidth - 2 * getResources().getDimensionPixelSize(R.dimen.dp_10) - 2 *
-                spanCount * getResources().getDimensionPixelSize(R.dimen.dp_3)) / spanCount;
-        targetHeight = (int) (targetWidth / Constants.CHARACTER_WIDTH_HEIGHT_SCALE);
         background = findViewById(R.id.background);
         background.post(new Runnable() {
             @Override
             public void run() {
                 background.removeAllViews();
-                for (int i = 0; i < background.getHeight() / targetHeight; i++) {
+                for (int i = 1; i < THIRD_HEIGHT_SPAN_COUNT; i++) {
                     View view = new View(ThirdStyleActivity.this);
                     view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.dp_1));
-                    if (i == 0) layoutParams.setMargins(0, (int) (targetHeight + getResources().getDimensionPixelSize(R.dimen.dp_1) * 5), 0, 0);
-                    else layoutParams.setMargins(0, (int) (targetHeight + getResources().getDimensionPixelSize(R.dimen.dp_1) * 4.5), 0, 0);
+                    layoutParams.setMargins(0, background.getHeight() * i / THIRD_HEIGHT_SPAN_COUNT, 0, 0);
                     view.setLayoutParams(layoutParams);
                     view.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_dashed));
                     background.addView(view);

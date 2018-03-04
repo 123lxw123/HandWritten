@@ -20,24 +20,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/background"
-                android:paddingTop="@dimen/dp_10"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 
-            <android.support.v4.widget.NestedScrollView
-                android:id="@+id/charactersScrollView"
+            <EditText
+                android:id="@+id/editCharacters"
+                android:paddingLeft="@dimen/dp_10"
+                android:paddingRight="@dimen/dp_10"
+                android:includeFontPadding="false"
+                android:textCursorDrawable="@drawable/cursor"
+                android:inputType="textMultiLine"
+                android:background="@null"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/charactersRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="@dimen/dp_10"/>
-            </android.support.v4.widget.NestedScrollView>
+                android:layout_height="wrap_content" />
 
             <com.lxw.handwritten.widget.handwrittenview.NewDrawPenView
                 android:id="@+id/drawPenView"

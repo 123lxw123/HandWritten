@@ -8,27 +8,29 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
+import android.text.Editable;
+import android.text.Layout;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.StaticLayout;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.lxw.handwritten.utils.UtilBitmap;
-import com.lxw.handwritten.utils.UtilScreen;
 import com.lxw.handwritten.utils.UtilSharedPreference;
 import com.lxw.handwritten.widget.handwrittenview.IPenConfig;
 import com.lxw.handwritten.widget.handwrittenview.NewDrawPenView;
@@ -39,21 +41,19 @@ import java.util.List;
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
+import static com.lxw.handwritten.Constants.SECOND_HEIGHT_SPAN_COUNT;
 
 public class SecondStyleActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private RecyclerView charactersRecyclerView;
     private NewDrawPenView drawPenView;
-    private LinearLayout background;
-    private NestedScrollView charactersScrollView;
+    private RelativeLayout background;
+    private EditText editCharacters;
     private Button resetBtn, colorBtn, confirmBtn, spaceBtn, newLineBtn, deleteBtn, saveBtn, cancelBtn;
-    private List<Bitmap> characterBitmaps;
-    private BaseQuickAdapter<Bitmap, BaseViewHolder> adapter;
     private static final int MSG_ADD_CHARACTER = 1000;
     private float left = 0f, right = 0f, top = 0f, bottom = 0f;
     private boolean isDrawPenViewReset = true;
     private boolean isConfirm = false;
-    private int targetWidth, targetHeight, screenWidth;
+    private int rowWidth,  rowHeight, bitmapHeight;
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){
 
@@ -64,16 +64,10 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
                 case MSG_ADD_CHARACTER:
                     Log.d("MSG_ADD_CHARACTER", "" + (int)left + (int)right + (int)top + (int)bottom);
                     Bitmap bitmap = UtilBitmap.getViewBitmap(drawPenView, left, right, top, bottom);
-                    bitmap = UtilBitmap.compress(bitmap, targetWidth, targetHeight);
-                    adapter.addData(adapter.getData().size() - 1, bitmap);
+                    bitmap = UtilBitmap.compress(bitmap, bitmapHeight);
+                    UtilBitmap.addEditTextSpan(editCharacters, bitmap);
                     drawPenView.setCanvasCode(IPenConfig.STROKE_TYPE_ERASER);
                     isDrawPenViewReset = true;
-                    charactersScrollView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            charactersScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                        }
-                    });
                     break;
             }
         }
@@ -88,14 +82,7 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpView() {
-        int spanCount = Constants.RECYCLERVIEW_SPAN_COUNT;
-        screenWidth = UtilScreen.getScreenWidth(this);
-        targetWidth = (screenWidth - 2 * getResources().getDimensionPixelSize(R.dimen.dp_10) - 2 *
-                spanCount * getResources().getDimensionPixelSize(R.dimen.dp_3)) / spanCount;
-        targetHeight = (int) (targetWidth / Constants.CHARACTER_WIDTH_HEIGHT_SCALE);
-        charactersRecyclerView = findViewById(R.id.charactersRecyclerView);
         drawPenView = findViewById(R.id.drawPenView);
-        charactersScrollView = findViewById(R.id.charactersScrollView);
         resetBtn = findViewById(R.id.reset);
         colorBtn = findViewById(R.id.color);
         confirmBtn = findViewById(R.id.confirm);
@@ -112,56 +99,40 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
         deleteBtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
-        // 虚线背景
-        background = findViewById(R.id.charactersBackground);
-        background.post(new Runnable() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        editCharacters = findViewById(R.id.editCharacters);
+        editCharacters.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+        editCharacters.setMaxLines(Constants.SECOND_HEIGHT_SPAN_COUNT);
+        editCharacters.setTextColor(UtilSharedPreference.getInstance(this).getIntValue(Constants.KEY_DEFAULT_PAINT_COLOR,
+                getResources().getColor(R.color.colorBlack)));
+        editCharacters.setCursorVisible(true);
+        editCharacters.setTextSize(0);
+        editCharacters.post(new Runnable() {
             @Override
             public void run() {
+                rowHeight = background.getHeight() / SECOND_HEIGHT_SPAN_COUNT;
+                bitmapHeight = rowHeight;
                 background.removeAllViews();
-                for (int i = 0; i < background.getHeight() / targetHeight; i++) {
+                for (int i = 1; i < SECOND_HEIGHT_SPAN_COUNT; i++) {
                     View view = new View(SecondStyleActivity.this);
                     view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.dp_1));
-                    if (i == 0) layoutParams.setMargins(0, (int) (targetHeight + getResources().getDimensionPixelSize(R.dimen.dp_1) * 5), 0, 0);
-                    else layoutParams.setMargins(0, (int) (targetHeight + getResources().getDimensionPixelSize(R.dimen.dp_1) * 4.5), 0, 0);
+                    layoutParams.setMargins(0, rowHeight * i, 0, 0);
                     view.setLayoutParams(layoutParams);
                     view.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_dashed));
                     background.addView(view);
                 }
+                setBitmapHeight();
             }
         });
-        characterBitmaps = new ArrayList<>();
-        characterBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
-        ((SimpleItemAnimator)charactersRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-        charactersRecyclerView.setLayoutManager(new GridLayoutManager(this, Constants.RECYCLERVIEW_SPAN_COUNT){
-
-            @Override
-            public void setSmoothScrollbarEnabled(boolean enabled) {
-                super.setSmoothScrollbarEnabled(isConfirm);
-            }
-        });
-        adapter = new BaseQuickAdapter<Bitmap, BaseViewHolder>(R.layout.item_character, characterBitmaps) {
-            @Override
-            protected void convert(BaseViewHolder helper, Bitmap item) {
-
-                if (!isConfirm && helper.getPosition() == getData().size() - 1) {
-                    helper.getView(R.id.imageView).setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT, targetHeight));
-                    Animation cursorAnim = AnimationUtils.loadAnimation(SecondStyleActivity.this,
-                            R.anim.cursor_invest_alpha);
-                    helper.setImageResource(R.id.imageView, R.drawable.ic_cursor);
-                    helper.getView(R.id.imageView).startAnimation(cursorAnim);
-                } else{
-                    helper.getView(R.id.imageView).setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT, targetHeight));
-                    helper.setImageBitmap(R.id.imageView, item);
-                    helper.getView(R.id.imageView).clearAnimation();
-                }
-            }
-        };
-        charactersRecyclerView.setNestedScrollingEnabled(false);
-        charactersRecyclerView.setAdapter(adapter);
+        // 虚线背景
+        background = findViewById(R.id.charactersBackground);
         drawPenView.setPaintColor(UtilSharedPreference.getInstance(this).getIntValue(Constants.KEY_DEFAULT_PAINT_COLOR,
                 getResources().getColor(R.color.colorBlack)));
         drawPenView.setOnTouchListener(new View.OnTouchListener() {
@@ -196,25 +167,34 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
         });
     }
 
+    public void setBitmapHeight() {
+        UtilBitmap.addEditTextSpan(editCharacters, Bitmap.createBitmap(1, rowHeight, Bitmap.Config.ARGB_8888));
+        editCharacters.post(new Runnable() {
+            @Override
+            public void run() {
+                bitmapHeight = (int) ((float) rowHeight * rowHeight / editCharacters.getHeight());
+                rowWidth = (int) ((float) rowHeight * editCharacters.getWidth() / editCharacters.getHeight());
+                UtilBitmap.deleteAllEditTextSpan(editCharacters);
+                UtilBitmap.addEditTextSpan(editCharacters, Bitmap.createBitmap(1, bitmapHeight, Bitmap.Config.ARGB_8888));
+            }
+        });
+    }
+
     public void measureBitmapRectangle(MotionEvent event){
-        // TODO 最小矩形要添加笔锋宽度的一半
-        int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_10);
+        int penPadding = getResources().getDimensionPixelSize(R.dimen.dp_20);
         if (left > event.getX()  - penPadding) left = event.getX() - penPadding;
         if (left < 0) left = 0;
         if (right < event.getX() + penPadding) right = event.getX() + penPadding;
         if (right > drawPenView.getWidth()) right = drawPenView.getWidth() ;
-        if (top > event.getY() - penPadding) top = event.getY() - penPadding;
-        if (top < 0) top = 0;
-        else if (top > drawPenView.getHeight() * Constants.PADDING_HEIGHT_SCALE) top = drawPenView.getHeight() * Constants.PADDING_HEIGHT_SCALE;
-        if (bottom < event.getY()  + penPadding) bottom = event.getY() + penPadding;
-        if (bottom > drawPenView.getHeight()) bottom = drawPenView.getHeight();
+        top = 0;
+        bottom = drawPenView.getHeight();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset:
-                if (adapter.getData().size() > 1) {
+                if (editCharacters.getText().length() > 1) {
                     new MaterialDialog.Builder(this)
                             .title("随手输入")
                             .positiveText("确定")
@@ -222,9 +202,8 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    characterBitmaps.clear();
-                                    characterBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
-                                    adapter.setNewData(characterBitmaps);
+                                    UtilBitmap.deleteAllEditTextSpan(editCharacters);
+                                    UtilBitmap.addEditTextSpan(editCharacters, Bitmap.createBitmap(1, bitmapHeight, Bitmap.Config.ARGB_8888));
                                 }
                             })
                             .content("当前操作会清空所有随写，是否继续？")
@@ -270,6 +249,7 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
             case R.id.confirm:
                 if (isConfirm) {
                     confirmBtn.setText("完成");
+                    editCharacters.setCursorVisible(true);
                     drawPenView.setVisibility(View.VISIBLE);
                     resetBtn.setVisibility(View.VISIBLE);
                     colorBtn.setVisibility(View.VISIBLE);
@@ -277,9 +257,9 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
                     newLineBtn.setVisibility(View.VISIBLE);
                     deleteBtn.setVisibility(View.VISIBLE);
                     saveBtn.setVisibility(View.GONE);
-                    adapter.addData(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
                 } else {
                     confirmBtn.setText("编辑");
+                    editCharacters.setCursorVisible(false);
                     drawPenView.setVisibility(View.GONE);
                     resetBtn.setVisibility(View.GONE);
                     colorBtn.setVisibility(View.GONE);
@@ -287,57 +267,46 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
                     newLineBtn.setVisibility(View.GONE);
                     deleteBtn.setVisibility(View.GONE);
                     saveBtn.setVisibility(View.VISIBLE);
-                    if (adapter.getData().size() > 0) adapter.remove(adapter.getData().size() - 1);
                 }
                 isConfirm = !isConfirm;
-                if (!adapter.getData().isEmpty()) {
-                    charactersScrollView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            charactersScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                        }
-                    });
-                }
                 break;
             case R.id.space:
-                int index = 0;
-                if (adapter.getData().size() >= 1) index = adapter.getData().size() - 1;
-                adapter.addData(index, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
+                UtilBitmap.addEditTextSpan(editCharacters, Bitmap.createBitmap(bitmapHeight / 3, 1, Bitmap.Config.ARGB_8888));
                 break;
             case R.id.newLine:
-                if (!charactersRecyclerView.isAnimating()) {
-                    List<Bitmap> originData = adapter.getData();
-                    int targetPosition = (originData.size() / Constants.RECYCLERVIEW_SPAN_COUNT + 1 ) *
-                            Constants.RECYCLERVIEW_SPAN_COUNT + 1;
-                    List<Bitmap> emptyBitmaps = new ArrayList<>();
-                    for (int i = originData.size(); i < targetPosition; i++) {
-                        emptyBitmaps.add(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
+                newLineBtn.setEnabled(false);
+                int lineCount = editCharacters.getLineCount();
+                int space = 4; // 决定计算换行的速度，越大越快
+                for (int i = 1; i < rowWidth; i = i + space) {
+                    Log.d("rowWidth", i + "     " +  editCharacters.getLineCount());
+                    SpannableString span = new SpannableString("1");
+                    span.setSpan(new ImageSpan(Bitmap.createBitmap(i, 1, Bitmap.Config.ARGB_8888)) , span.length() - 1, span.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    Editable editable = Editable.Factory.getInstance().newEditable(editCharacters.getText());
+                    editable.insert(editCharacters.getSelectionStart(), span);
+                    Layout layout = new StaticLayout(editable, editCharacters.getPaint(),
+                            editCharacters.getWidth() - editCharacters.getPaddingLeft() - editCharacters.getPaddingRight(),
+                            Layout.Alignment.ALIGN_NORMAL, 1, 1, false);
+                    if (layout.getLineCount() > lineCount) {
+                        UtilBitmap.addEditTextSpan(editCharacters, Bitmap.createBitmap(i - space, 1, Bitmap.Config.ARGB_8888));
+                        UtilBitmap.addEditTextSpan(editCharacters, Bitmap.createBitmap(space + 1, bitmapHeight, Bitmap.Config.ARGB_8888));
+                        break;
                     }
-                    adapter.addData(adapter.getData().size() - 1, emptyBitmaps);
-                    charactersScrollView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            charactersScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                        }
-                    });
                 }
+                newLineBtn.setEnabled(true);
                 break;
             case R.id.delete:
-                if (adapter.getData().size() > 1 && !charactersRecyclerView.isAnimating()) {
-                    adapter.remove(adapter.getData().size() - 2);
-                    charactersScrollView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            charactersScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                        }
-                    });
-                }
+                deleteBtn.setEnabled(false);
+                UtilBitmap.deleteEditTextSpan(editCharacters);
+                if (editCharacters.length() == 0) UtilBitmap.addEditTextSpan(editCharacters, Bitmap.createBitmap(1, bitmapHeight, Bitmap.Config.ARGB_8888));
+                editCharacters.setCursorVisible(true);
+                deleteBtn.setEnabled(true);
                 break;
-                case R.id.save:
-                    Intent intent = new Intent();
-                    Constants.characters = UtilBitmap.getScrollViewBitmap(charactersScrollView);
-                    setResult(AppCompatActivity.RESULT_OK, intent);
-                    finish();
+            case R.id.save:
+                Intent intent = new Intent();
+                editCharacters.setCursorVisible(false);
+                Constants.characters = UtilBitmap.getViewBitmap(editCharacters);
+                setResult(AppCompatActivity.RESULT_OK, intent);
+                finish();
                 break;
             case R.id.cancel:
                 finish();

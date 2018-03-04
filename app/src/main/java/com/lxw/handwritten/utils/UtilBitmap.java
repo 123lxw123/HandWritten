@@ -1,11 +1,13 @@
 package com.lxw.handwritten.utils;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.support.v4.widget.NestedScrollView;
+import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.view.View;
+import android.widget.EditText;
 
 /**
  * Created by Zion on 2018/1/28.
@@ -41,18 +43,16 @@ public class UtilBitmap {
         return null;
     }
 
-    public static Bitmap compress(Bitmap bitmap, int targetWidth, int targetHeight) {
+    public static Bitmap compress(Bitmap bitmap, int targetHeight) {
         try {
             int bitmapWidth = bitmap.getWidth();
             int bitmapHeight = bitmap.getHeight();
             // 缩放图片的尺寸
-            float scaleWidth = (float) targetWidth / bitmapWidth;
-            float scaleHeight = (float) targetHeight / bitmapHeight;
-            float scale = Math.max(scaleWidth, scaleHeight);
+            float scale = (float) targetHeight / bitmapHeight;
             if (scale < 1f){
                 Matrix matrix = new Matrix();
-                matrix.setScale(scale, scale);
-                // 产生缩放后的Bitmap对象
+                matrix.postScale(scale, scale);
+                // 产生缩放后的Bitmap对象a
                 return Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
             }
         } catch (Exception ex) {
@@ -60,24 +60,6 @@ public class UtilBitmap {
         } finally {
 //            bitmap.recycle();
         }
-        return bitmap;
-    }
-
-    /**
-     * NestedScrollView截屏
-     * @param scrollView 要截图的NestedScrollView
-     * @return Bitmap
-     */
-    public static Bitmap getScrollViewBitmap(NestedScrollView scrollView) {
-        int h = 0;
-        Bitmap bitmap;
-        for (int i = 0; i < scrollView.getChildCount(); i++) {
-            h += scrollView.getChildAt(i).getHeight();
-            scrollView.getChildAt(i).setBackgroundColor(Color.parseColor("#00000000"));
-        }
-        bitmap = Bitmap.createBitmap(scrollView.getWidth(), h, Bitmap.Config.ARGB_8888);
-        final Canvas canvas = new Canvas(bitmap);
-        scrollView.draw(canvas);
         return bitmap;
     }
 
@@ -92,4 +74,47 @@ public class UtilBitmap {
         return bitmap;
     }
 
+    public static void addEditTextSpan(EditText editText, Bitmap bitmap) {
+        if(bitmap == null)
+            return;
+        SpannableString span = new SpannableString("1");
+        int start = editText.getSelectionStart();
+        span.setSpan(new ImageSpan(bitmap) , span.length() - 1, span.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if(editText != null) {
+            Editable et = editText.getText();
+            et.insert(start, span);
+            editText.setText(et);
+            editText.setSelection(start + span.length());
+        }
+        editText.requestLayout();
+    }
+    /*
+    * this is delete bitmap on edit text
+    * from end to start
+    */
+    public static void deleteAllEditTextSpan(EditText editText) {
+        Spanned s = editText.getEditableText();
+        ImageSpan[] imageSpan = s.getSpans(0, s.length(), ImageSpan.class);
+        for (int i = imageSpan.length - 1; i >= 0; i--) {
+            int start = s.getSpanStart(imageSpan[i]);
+            int end = s.getSpanEnd(imageSpan[i]);
+            Editable et = editText.getText();
+            et.delete(start, end);
+        }
+        editText.requestLayout();
+    }
+
+    public static void deleteEditTextSpan(EditText editText) {
+        Spanned s = editText.getEditableText();
+        ImageSpan[] imageSpan = s.getSpans(0, s.length(), ImageSpan.class);
+        int i = imageSpan.length - 1;
+        if (i > 0) {
+            int start = s.getSpanStart(imageSpan[i]);
+            int end = s.getSpanEnd(imageSpan[i]);
+            Editable et = editText.getText();
+            et.delete(start, end);
+            editText.setSelection(start);
+        }
+        editText.requestLayout();
+    }
 }
