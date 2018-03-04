@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -58,7 +57,7 @@ public class ThirdStyleActivity extends AppCompatActivity implements View.OnClic
                 for (int i = 1; i < THIRD_HEIGHT_SPAN_COUNT; i++) {
                     View view = new View(ThirdStyleActivity.this);
                     view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.dp_1));
                     layoutParams.setMargins(0, background.getHeight() * i / THIRD_HEIGHT_SPAN_COUNT, 0, 0);
                     view.setLayoutParams(layoutParams);
