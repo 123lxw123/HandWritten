@@ -106,14 +106,11 @@ public class UtilBitmap {
 
     public static void deleteEditTextSpan(EditText editText) {
         Spanned s = editText.getEditableText();
-        ImageSpan[] imageSpan = s.getSpans(0, s.length(), ImageSpan.class);
-        int i = imageSpan.length - 1;
-        if (i > 0) {
-            int start = s.getSpanStart(imageSpan[i]);
-            int end = s.getSpanEnd(imageSpan[i]);
+        int i = s.length() - 1;
+        if (i >= 0) {
             Editable et = editText.getText();
-            et.delete(start, end);
-            editText.setSelection(start);
+            et.delete(i, i + 1);
+            editText.setSelection(i);
         }
         editText.requestLayout();
     }
