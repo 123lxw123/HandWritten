@@ -25,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -46,6 +47,7 @@ import static com.lxw.handwritten.Constants.FIRST_HEIGHT_SPAN_COUNT;
 public class FirstStyleActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText editCharacters;
+    private ScrollView scrollCharacters;
     private NewDrawPenView drawPenView;
     private RelativeLayout background;
     private Button resetBtn, colorBtn, sizeBtn, confirmBtn, spaceBtn, newLineBtn, deleteBtn, saveBtn, cancelBtn;
@@ -82,6 +84,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpView() {
+        scrollCharacters = findViewById(R.id.scrollCharacters);
         drawPenView = findViewById(R.id.drawPenView);
         resetBtn = findViewById(R.id.reset);
         colorBtn = findViewById(R.id.color);
@@ -349,7 +352,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
                 case R.id.save:
                     Intent intent = new Intent();
                     editCharacters.setCursorVisible(false);
-                    Constants.characters = UtilBitmap.getViewBitmap(editCharacters);
+                    Constants.characters = UtilBitmap.getScrollViewBitmap(scrollCharacters);
                     setResult(AppCompatActivity.RESULT_OK, intent);
                     finish();
                 break;

@@ -1,13 +1,20 @@
 package com.lxw.handwritten.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ScrollView;
+
+import com.lxw.handwritten.R;
 
 /**
  * Created by Zion on 2018/1/28.
@@ -41,6 +48,30 @@ public class UtilBitmap {
 //            bitmap.recycle();
         }
         return null;
+    }
+
+    public static Bitmap getScrollViewBitmap(ScrollView scrollView) {
+        int height = 0;
+        //理论上scrollView只会有一个子View啦
+        for (int i = 0; i < scrollView.getChildCount(); i++) {
+            height += scrollView.getChildAt(i).getHeight();
+        }
+        Log.d("ScrollViewheight", height + "");
+        //创建保存缓存的bitmap
+        Bitmap bitmap = Bitmap.createBitmap(scrollView.getWidth(), height, Bitmap.Config.ARGB_8888);
+        //可以简单的把Canvas理解为一个画板 而bitmap就是块画布
+        Canvas canvas = new Canvas(bitmap);
+        //获取ScrollView的背景颜色
+        Drawable background = scrollView.getContext().getResources().getDrawable(R.drawable.transparent);
+        //画出ScrollView的背景色 这里只用了color一种 有需要也可以自己扩展 也可以自己直接指定一种背景色
+        if (background instanceof ColorDrawable) {
+            ColorDrawable colorDrawable = (ColorDrawable) background;
+            int color = colorDrawable.getColor();
+            canvas.drawColor(color);
+        }
+        //把view的内容都画到指定的画板Canvas上
+        scrollView.draw(canvas);
+        return bitmap;
     }
 
     public static Bitmap compress(Bitmap bitmap, int targetHeight) {

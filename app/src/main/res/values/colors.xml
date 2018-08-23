@@ -10,4 +10,5 @@
     <color name="colorGray">#BFBFBF</color>
     <color name="colorYellow">#F4EA2A</color>
     <color name="colorGreen">#2AA515</color>
+    <drawable name="transparent">#00000000</drawable>
 </resources>

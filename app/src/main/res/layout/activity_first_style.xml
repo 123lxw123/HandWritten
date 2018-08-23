@@ -25,18 +25,21 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
-
-            <EditText
-                android:id="@+id/editCharacters"
-                android:paddingLeft="@dimen/dp_10"
-                android:paddingRight="@dimen/dp_10"
-                android:includeFontPadding="false"
-                android:textCursorDrawable="@drawable/cursor"
-                android:inputType="textMultiLine"
-                android:background="@null"
+            <ScrollView
+                android:id="@+id/scrollCharacters"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                android:layout_height="match_parent">
+                <EditText
+                    android:id="@+id/editCharacters"
+                    android:paddingLeft="@dimen/dp_10"
+                    android:paddingRight="@dimen/dp_10"
+                    android:includeFontPadding="false"
+                    android:textCursorDrawable="@drawable/cursor"
+                    android:inputType="textMultiLine"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </ScrollView>
             <com.lxw.handwritten.widget.handwrittenview.NewDrawPenView
                 android:id="@+id/drawPenView"
                 android:layout_width="match_parent"
