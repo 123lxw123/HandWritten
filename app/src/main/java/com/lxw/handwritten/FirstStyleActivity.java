@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -47,6 +48,7 @@ import static com.lxw.handwritten.Constants.FIRST_HEIGHT_SPAN_COUNT;
 public class FirstStyleActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText editCharacters;
+    private TextView textCharacters;
     private ScrollView scrollCharacters;
     private NewDrawPenView drawPenView;
     private RelativeLayout background;
@@ -85,6 +87,7 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
     @SuppressLint("ClickableViewAccessibility")
     private void setUpView() {
         scrollCharacters = findViewById(R.id.scrollCharacters);
+        textCharacters = findViewById(R.id.textCharacters);
         drawPenView = findViewById(R.id.drawPenView);
         resetBtn = findViewById(R.id.reset);
         colorBtn = findViewById(R.id.color);
@@ -304,6 +307,8 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
                     newLineBtn.setVisibility(View.VISIBLE);
                     deleteBtn.setVisibility(View.VISIBLE);
                     saveBtn.setVisibility(View.GONE);
+
+                    editCharacters.setVisibility(View.VISIBLE);
                 } else {
                     confirmBtn.setText("编辑");
                     editCharacters.setCursorVisible(false);
@@ -315,6 +320,9 @@ public class FirstStyleActivity extends AppCompatActivity implements View.OnClic
                     newLineBtn.setVisibility(View.GONE);
                     deleteBtn.setVisibility(View.GONE);
                     saveBtn.setVisibility(View.VISIBLE);
+
+                    textCharacters.setText(editCharacters.getText());
+                    editCharacters.setVisibility(View.GONE);
                 }
                 isConfirm = !isConfirm;
                 break;

@@ -27,19 +27,30 @@
                 android:layout_height="match_parent"/>
             <ScrollView
                 android:id="@+id/scrollCharacters"
+                android:scrollbars="none"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <EditText
-                    android:id="@+id/editCharacters"
+                <TextView
+                    android:id="@+id/textCharacters"
                     android:paddingLeft="@dimen/dp_10"
                     android:paddingRight="@dimen/dp_10"
                     android:includeFontPadding="false"
-                    android:textCursorDrawable="@drawable/cursor"
-                    android:inputType="textMultiLine"
                     android:background="@null"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </ScrollView>
+
+            <EditText
+                android:id="@+id/editCharacters"
+                android:paddingLeft="@dimen/dp_10"
+                android:paddingRight="@dimen/dp_10"
+                android:includeFontPadding="false"
+                android:textCursorDrawable="@drawable/cursor"
+                android:inputType="textMultiLine"
+                android:background="@null"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <com.lxw.handwritten.widget.handwrittenview.NewDrawPenView
                 android:id="@+id/drawPenView"
                 android:layout_width="match_parent"

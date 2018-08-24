@@ -25,6 +25,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -46,6 +48,8 @@ import static com.lxw.handwritten.Constants.SECOND_HEIGHT_SPAN_COUNT;
 public class SecondStyleActivity extends AppCompatActivity implements View.OnClickListener {
 
     private NewDrawPenView drawPenView;
+    private ScrollView scrollCharacters;
+    private TextView textCharacters;
     private RelativeLayout background;
     private EditText editCharacters;
     private Button resetBtn, colorBtn, sizeBtn, confirmBtn, spaceBtn, newLineBtn, deleteBtn, saveBtn, cancelBtn;
@@ -83,6 +87,8 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
     @SuppressLint("ClickableViewAccessibility")
     private void setUpView() {
         drawPenView = findViewById(R.id.drawPenView);
+        scrollCharacters = findViewById(R.id.scrollCharacters);
+        textCharacters = findViewById(R.id.textCharacters);
         resetBtn = findViewById(R.id.reset);
         colorBtn = findViewById(R.id.color);
         sizeBtn = findViewById(R.id.size);
@@ -296,20 +302,27 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
                     drawPenView.setVisibility(View.VISIBLE);
                     resetBtn.setVisibility(View.VISIBLE);
                     colorBtn.setVisibility(View.VISIBLE);
+                    sizeBtn.setVisibility(View.VISIBLE);
                     spaceBtn.setVisibility(View.VISIBLE);
                     newLineBtn.setVisibility(View.VISIBLE);
                     deleteBtn.setVisibility(View.VISIBLE);
                     saveBtn.setVisibility(View.GONE);
+
+                    editCharacters.setVisibility(View.VISIBLE);
                 } else {
                     confirmBtn.setText("编辑");
                     editCharacters.setCursorVisible(false);
                     drawPenView.setVisibility(View.GONE);
                     resetBtn.setVisibility(View.GONE);
                     colorBtn.setVisibility(View.GONE);
+                    sizeBtn.setVisibility(View.GONE);
                     spaceBtn.setVisibility(View.GONE);
                     newLineBtn.setVisibility(View.GONE);
                     deleteBtn.setVisibility(View.GONE);
                     saveBtn.setVisibility(View.VISIBLE);
+
+                    textCharacters.setText(editCharacters.getText());
+                    editCharacters.setVisibility(View.GONE);
                 }
                 isConfirm = !isConfirm;
                 break;
@@ -347,7 +360,7 @@ public class SecondStyleActivity extends AppCompatActivity implements View.OnCli
             case R.id.save:
                 Intent intent = new Intent();
                 editCharacters.setCursorVisible(false);
-                Constants.characters = UtilBitmap.getViewBitmap(editCharacters);
+                Constants.characters = UtilBitmap.getScrollViewBitmap(scrollCharacters);
                 setResult(AppCompatActivity.RESULT_OK, intent);
                 finish();
                 break;
